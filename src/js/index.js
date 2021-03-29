@@ -50,6 +50,7 @@
     DOM.splitMnemonic = $(".splitMnemonic");
     DOM.showSplitMnemonic = $(".showSplitMnemonic");
     DOM.phraseSplit = $(".phraseSplit");
+    DOM.hodlerplate = $(".hodlerplate");
     DOM.phraseSplitWarn = $(".phraseSplitWarn");
     DOM.passphrase = $(".passphrase");
     DOM.generateContainer = $(".generate-container");
@@ -289,6 +290,7 @@
         calcBip85();
         // Show the word indexes
         showWordIndexes();
+        writeBinaryPhrase(phrase);
         writeSplitPhrase(phrase);
     }
 
@@ -337,6 +339,7 @@
             clearEntropyFeedback();
             DOM.phrase.val("");
             DOM.phraseSplit.val("");
+            DOM.hodlerplate.val("");
             showValidationError("Blank entropy");
             return;
         }
@@ -377,6 +380,7 @@
         // Clear existing mnemonic and passphrase
         DOM.phrase.val("");
         DOM.phraseSplit.val("");
+        DOM.hodlerplate.val("");
         DOM.passphrase.val("");
         DOM.rootKey.val("");
         clearAddressesList();
@@ -401,6 +405,7 @@
         // Clear existing mnemonic and passphrase
         DOM.phrase.val("");
         DOM.phraseSplit.val("");
+        DOM.hodlerplate.val("");
         DOM.passphrase.val("");
         seed = null;
         if (rootKeyChangedTimeoutEvent != null) {
@@ -1746,6 +1751,23 @@
         return phrase;
     }
 
+    function writeBinaryPhrase(phrase){        
+        var oldLanguage = getLanguageFromPhrase(phrase);
+        var newLanguage = "binary";
+        var oldPhrase = DOM.phrase.val();
+        var oldWords = phraseToWordArray(oldPhrase);
+        var newWords = [];
+        for (var i=0; i<oldWords.length; i++) {
+            var oldWord = oldWords[i];
+            var index = WORDLISTS[oldLanguage].indexOf(oldWord);
+            var newWord = WORDLISTS[newLanguage][index];
+            newWords.push(newWord);
+        }
+        newPhrase = wordArrayToPhrase(newWords);
+
+        DOM.hodlerplate.val(newPhrase);
+    }
+
     function writeSplitPhrase(phrase) {
         var wordCount = phrase.split(/\s/g).length;
         var left=[];
@@ -1853,6 +1875,7 @@
         var phrase = mnemonic.toMnemonic(entropyArr);
         // Set the mnemonic in the UI
         DOM.phrase.val(phrase);
+        writeBinaryPhrase(phrase);
         writeSplitPhrase(phrase);
         // Show the word indexes
         showWordIndexes();
